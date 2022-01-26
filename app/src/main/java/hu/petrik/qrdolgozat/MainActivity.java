@@ -25,6 +25,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         init();
+
+        scanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                IntentIntegrator i = new IntentIntegrator(MainActivity.this);
+                i.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
+
+                i.initiateScan();
+            }
+        });
     }
 
     public void init() {
