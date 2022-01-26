@@ -1,9 +1,13 @@
 package hu.petrik.qrdolgozat;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Button scanButton, kiirButton;
     private TextView szovegTextView;
+    private boolean writePermission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,5 +66,27 @@ public class MainActivity extends AppCompatActivity {
         scanButton = findViewById(R.id.scanButton);
         kiirButton = findViewById(R.id.kiirButton);
         szovegTextView = findViewById(R.id.szovegTextView);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+                writePermission = false;
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        } else {
+            writePermission = true;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == 0) {
+            writePermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            == PackageManager.PERMISSION_GRANTED;
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }
