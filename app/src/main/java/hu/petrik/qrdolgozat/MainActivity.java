@@ -37,6 +37,26 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+
+        if (result != null) {
+            String s = szovegTextView.getText().toString();
+
+            szovegTextView.setText((result.getContents()));
+            try {
+                Uri uri = Uri.parse(s);
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(intent);
+            } catch (Exception e) {
+                Log.d("URI ERROR", e.toString());
+            }
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     public void init() {
         scanButton = findViewById(R.id.scanButton);
         kiirButton = findViewById(R.id.kiirButton);
