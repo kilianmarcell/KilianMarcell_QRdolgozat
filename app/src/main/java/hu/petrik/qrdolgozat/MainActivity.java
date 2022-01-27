@@ -6,12 +6,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,13 +19,8 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -37,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private Button scanButton, kiirButton;
     private TextView szovegTextView;
     private boolean writePermission;
+    private static final String fajlnev = "scannedCodes.csv";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,19 +52,21 @@ public class MainActivity extends AppCompatActivity {
         kiirButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Date date = Calendar.getInstance().getTime();
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                String fileSzoveg = szovegTextView.getText().toString() + ", " + format.format(date);
+                if (writePermission) {
+                    Date date = Calendar.getInstance().getTime();
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                    String fileSzoveg = szovegTextView.getText().toString() + ", " + format.format(date);
 
-                try {
-                    File file = new File(Environment.getExternalStorageDirectory() + "/scannedCodes.csv");
-                    FileOutputStream fileOutputStream = new FileOutputStream(new File(Environment.getExternalStorageDirectory(), "scannedCodes.csv"));
-                    fileOutputStream.write(fileSzoveg.getBytes());
-                    fileOutputStream.close();
-                    Toast.makeText(MainActivity.this, "Siker", Toast.LENGTH_SHORT).show();
-                } catch (IOException e) {
-                    Toast.makeText(MainActivity.this, "Fail", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
+                    try {
+                        FileOutputStream fileOutputStream = openFileOutput(fajlnev, MODE_PRIVATE);
+                        fileOutputStream.write(fileSzoveg.getBytes());
+
+                        Toast.makeText(MainActivity.this, "Sikeresen elmentve: " + getFilesDir() + "/scannedCodes.csv", Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, "A fájlbaíráshoz engedélyezze a fájl hozzáférést!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
